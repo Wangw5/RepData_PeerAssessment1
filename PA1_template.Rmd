@@ -7,7 +7,6 @@ output: html_document
 ## Loading and preprocessing the data
 
 ```{r}
-library(xtable)
 df <- read.csv("activity.csv",header= T)
 ```
 
@@ -22,7 +21,7 @@ tmp
 
 
 Below is the histogram of stpes taken each day.
-```{r}
+```{r hist_w_missing}
 hist(tmp$total.steps, xlab = "Steps taken each day", main = "Histogram of steps\n taken each day", breaks = 20, col = "blue")
 ```
 
@@ -34,7 +33,7 @@ median.steps.day <- round(median(tmp$total.steps),0)
 The mean total number of steps taken per day is `r mean.steps.day`. The median total number of steps take per day is `r as.character(median.steps.day)`.
 
 ## What is the average daily activity pattern?
-```{r, echo=FALSE}
+```{r plot_interval_steps_w_missing, echo=FALSE}
 tmp2 <- aggregate(df$steps, by = list(df$interval), FUN= "mean", na.rm = T)
 names(tmp2) <- c("interval","steps")
 plot(tmp2$interval,tmp2$steps, type = "l", xlab= "time interval (per 5 mins)", ylab = "Mean number of steps")
@@ -49,7 +48,7 @@ n.missing <- nrow(df[which(is.na(df$steps)),])
 
 There are `r n.missing` missing values in the dataset. To fill in all of the missing steps, we used mean for that 5-minute interval.
 
-```{r}
+```{r hist_wo_missing}
 ## create a new dataset called "df_new" with all the missing values filled in
 df_new <- merge(df, tmp2, by = "interval")
 df_new$steps <- ifelse(is.na(df_new$steps.x), df_new$steps.y, df_new$steps.x)
@@ -79,7 +78,7 @@ df_new$day <- ifelse(weekdays(as.Date(df_new$date)) %in% c("Saturday","Sunday"),
 df_new$day <- as.factor(df_new$day)
 ```
 
-```{r}
+```{r plot_interval_steps_wo_missing}
 library(lattice)
 tmp4 <- aggregate(df_new$steps, by = list(df_new$interval,df_new$day), FUN= "mean")
 names(tmp4) <- c("interval","day","steps")
